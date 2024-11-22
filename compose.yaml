@@ -1,0 +1,31 @@
+name: pokemon-tcg-dex
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: ash
+      POSTGRES_DB: pokedex
+      POSTGRES_PASSWORD: pikachu
+    networks:
+      - kanto
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ash@pokedex.com
+      PGADMIN_DEFAULT_PASSWORD: pikachu
+    volumes:
+      - ${PWD}/pgadmin_servers.json:/pgadmin4/servers.json
+    networks:
+      - kanto
+    ports:
+      - 50151:80
+
+
+networks:
+  kanto:
+    driver: bridge 
+
