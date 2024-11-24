@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"io"
 	"log"
-	"net/http"
-	"os"
 
 	"github.com/matheusjorge/pokemon-tcg-dex/src/internal"
+	"github.com/matheusjorge/pokemon-tcg-dex/src/repositories"
+	"github.com/matheusjorge/pokemon-tcg-dex/src/tools"
 )
 
 func main() {
@@ -15,35 +13,20 @@ func main() {
 	config, err := internal.LoadConfigs()
 	if err != nil {
 		log.Fatal("Could no load configs")
-	}
 
-	// Create Request
-	getCardsURL := fmt.Sprintf("%s/sv8/1.png", config.PokemonTCGImagesURL)
-	req, err := http.NewRequest("GET", getCardsURL, nil)
+	}
+	pgRepo, err := repositories.PgConnect(config.PostgresURL)
 	if err != nil {
-		log.Fatal("Could not create request")
+		log.Fatalf("Error: %s", err)
 	}
 
-	req.Header.Set("x-api-key", config.PokemonTCGAPIKey)
+	// pgRepo.InsertManyCards(cardsPg)
+	// cardsNew := pgRepo.FetchAllCards()
+	// log.Print(cardsNew[162])
 
-	// Make Request
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// tools.FetchCardsData(*config)
+	allCards := tools.LoadAllSets(*config)
+	log.Println(len(allCards))
 
-	if err != nil {
-		log.Fatal("Request not made")
-	}
-
-	defer resp.Body.Close()
-
-	file, err := os.Create("sv8-1.png")
-	if err != nil {
-		log.Fatal("Could not create file")
-	}
-
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body")
-	}
-
+	pgRepo.InsertManyCards(allCards)
 }
