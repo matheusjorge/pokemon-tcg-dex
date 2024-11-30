@@ -1,24 +1,31 @@
 package internal
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 type Config struct {
-	PokemonTCGAPIKey    string
-	PokemonTCGAPIURL    string
-	PokemonTCGImagesURL string
-	PostgresURL         string
-	RemoteDataURL       string
-	DataPath            string
-	DataConfigFile      string
+	PokemonTCGAPIKey       string
+	PokemonTCGAPIURL       string
+	PokemonTCGImagesURL    string
+	PostgresURL            string
+	RemoteDataURL          string
+	DataPath               string
+	DataConfigFile         string
+	ImageDownloaderWorkers int
+	SidecarPort            int
 }
 
 const (
-	PokemonTCGAPIURL_DEFAULT    = "https://api.pokemontcg.io"
-	PokemonTCGImagesURL_DEFAULT = "https://images.pokemontcg.io"
-	PostgresURL_DEFAUT          = "postgresql://ash:pikachu@0.0.0.0:5432/pokedex"
-	RemoteDataURL_DEFAULT       = "https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master"
-	DataPath_DEFAULT            = "data"
-	DataConfigFile_DEFAULT      = "data_config.json"
+	PokemonTCGAPIURL_DEFAULT       = "https://api.pokemontcg.io"
+	PokemonTCGImagesURL_DEFAULT    = "https://images.pokemontcg.io"
+	PostgresURL_DEFAUT             = "postgresql://ash:pikachu@0.0.0.0:5432/pokedex"
+	RemoteDataURL_DEFAULT          = "https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master"
+	DataPath_DEFAULT               = "data"
+	DataConfigFile_DEFAULT         = "data_config.json"
+	ImageDownloaderWorkers_DEFAULT = "5"
+	SidecarPort_DEFAULT            = "8000"
 )
 
 func LoadConfigs() (*Config, error) {
@@ -31,6 +38,8 @@ func LoadConfigs() (*Config, error) {
 	config.RemoteDataURL = loadEnvVar("REMOTE_DATA_URL", RemoteDataURL_DEFAULT)
 	config.DataPath = loadEnvVar("DATA_PATH", DataPath_DEFAULT)
 	config.DataConfigFile = loadEnvVar("DATA_CONFIG_FILE", DataConfigFile_DEFAULT)
+	config.ImageDownloaderWorkers, _ = strconv.Atoi(loadEnvVar("IMAGE_DOWNLOADER_WORKERS", ImageDownloaderWorkers_DEFAULT))
+	config.SidecarPort, _ = strconv.Atoi(loadEnvVar("SIDECAR_PORT", SidecarPort_DEFAULT))
 
 	return config, nil
 }

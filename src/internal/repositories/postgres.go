@@ -3,10 +3,11 @@ package repositories
 import (
 	"context"
 	"log"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/matheusjorge/pokemon-tcg-dex/src/internal/models"
 	"github.com/matheusjorge/pokemon-tcg-dex/src/internal/utils"
-	"github.com/matheusjorge/pokemon-tcg-dex/src/models"
 )
 
 type PgRepo struct {
@@ -36,7 +37,7 @@ func (r *PgRepo) InsertCard(card models.Card) error {
     national_pokedex_number,
     image_small,
     image_large,
- supertype,
+    supertype,
     subtypes,
     level,
     hp,
@@ -79,7 +80,6 @@ func (r *PgRepo) InsertCard(card models.Card) error {
   )
   `
 
-	// bytesRules, _ := json.Marshal(card.Rules)
 	args := pgx.NamedArgs{
 		"id":                      card.Id,
 		"name":                    card.Name,
@@ -117,12 +117,67 @@ func (r *PgRepo) InsertCard(card models.Card) error {
 }
 
 func (r *PgRepo) InsertManyCards(cards []models.Card) {
-	for i, card := range cards {
-		err := r.InsertCard(card)
-		if err != nil {
-			log.Printf("Failed to insert card no %d", i)
-		}
+	var rows [][]interface{}
+	tableName := "cards"
+	columns := []string{
+		"id",
+		"name",
+		"set_id",
+		"number",
+		"artist",
+		"rarity",
+		"national_pokedex_number",
+		"image_small",
+		"image_large",
+		"supertype",
+		"subtypes",
+		"level",
+		"hp",
+		"types",
+		"evolves_from",
+		"evolves_to",
+		"rules",
+		"ancient_trait",
+		"abilities",
+		"attacks",
+		"weaknesses",
+		"resistances",
+		"retreat_cost",
+		"converted_retreat_cost",
 	}
+	for _, card := range cards {
+		rows = append(rows, []interface{}{
+			card.Id,
+			card.Name,
+			card.SetId,
+			card.Number,
+			card.Artist,
+			card.Rarity,
+			card.NationalPokedexNumber,
+			card.Images.Small,
+			card.Images.Large,
+			card.Supertype,
+			card.Subtypes,
+			card.Level,
+			card.HP,
+			card.Types,
+			card.EvolvesFrom,
+			card.EvolvesTo,
+			card.Rules,
+			utils.JsonMarshal(card.AncientTrait),
+			utils.JsonMarshal(card.Abilities),
+			utils.JsonMarshal(card.Attacks),
+			utils.JsonMarshal(card.Weaknessess),
+			utils.JsonMarshal(card.Resistances),
+			card.RetreatCost,
+			card.ConvertedRetreatCost,
+		})
+	}
+	count, err := r.Conn.CopyFrom(context.Background(), pgx.Identifier{tableName}, columns, pgx.CopyFromRows(rows))
+	if err != nil {
+		slog.Error("Failed to insert cards", slog.Any("err_msg", err))
+	}
+	slog.Debug("Inserted rows", slog.Int64("count", count))
 }
 
 func (r *PgRepo) FetchAllCards() []models.Card {
@@ -169,7 +224,7 @@ func (r *PgRepo) FetchAllCards() []models.Card {
 			&card.ConvertedRetreatCost,
 		)
 		if err != nil {
-			log.Printf("Failed to parse card: %s", err)
+			slog.Error("Failed to parse card", slog.Any("err_msg", err))
 			continue
 		}
 
@@ -185,4 +240,29 @@ func (r *PgRepo) FetchAllCards() []models.Card {
 	}
 
 	return cards
+}
+
+func (r *PgRepo) GetImageURLs() ([]string, error) {
+	query := `
+	SELECT image_small FROM cards
+	`
+
+	rows, err := r.Conn.Query(context.Background(), query)
+	if err != nil {
+		return []string{}, nil
+	}
+
+	imageURLs := []string{}
+	for rows.Next() {
+		var url string
+		err = rows.Scan(&url)
+		if err != nil {
+			slog.Error("Failed to get url", slog.Any("err_msg", err))
+		}
+
+		imageURLs = append(imageURLs, url)
+	}
+
+	return imageURLs, nil
+
 }
