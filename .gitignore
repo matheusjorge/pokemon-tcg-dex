@@ -27,3 +27,14 @@ go.work.sum
 
 # data files
 data/**/*.json
+data/**/*.png
+tmp/*
+
+
+# Python
+**/__pycache__
+.python-version
+
+
+# Bin files
+tcgdex

@@ -2,7 +2,8 @@ name: pokemon-tcg-dex
 
 services:
   postgres:
-    image: postgres
+    build:
+      dockerfile: images/postgres.dockerfile
     environment:
       POSTGRES_USER: ash
       POSTGRES_DB: pokedex
