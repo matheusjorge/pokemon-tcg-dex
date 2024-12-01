@@ -8,6 +8,8 @@ import torch
 
 
 from image_embedding_sidecar.v1.contracts import (
+    ComputeSimilarityRequest,
+    ComputeSimilarityResponse,
     EmbedImageRequest,
     EmbedImageResponse,
     AvailableModels,
@@ -53,3 +55,45 @@ async def embed_image(request: EmbedImageRequest) -> EmbedImageResponse:
     print(f"Embedding time: {func_end - embedding_start}")
 
     return EmbedImageResponse(embeddings=embedding.tolist())
+
+
+@router.post("/compute_similarity")
+async def compute_similarity(
+    request: ComputeSimilarityRequest,
+) -> ComputeSimilarityResponse:
+    func_start = time.perf_counter()
+    model = models_loader.load_model(request.model)
+    model.eval()
+    if model is None:
+        raise HTTPException(status_code=406, detail="model not available")
+
+    config = resolve_data_config({}, model=model)
+    transform = create_transform(**config)
+
+    download_start = time.perf_counter()
+    tasks = [load_image(f) for f in [request.base, request.target]]
+
+    imgs = await asyncio.gather(*tasks)
+
+    tensors_start = time.perf_counter()
+    tensors = [transform(img) for img in imgs]
+    embedding_start = time.perf_counter()
+    embedding = model(torch.stack(tensors))
+
+    func_end = time.perf_counter()
+    print(f"Total time: {func_end - func_start}")
+    print(f"Load Model time: {download_start - func_start}")
+    print(f"Download images time: {tensors_start - download_start}")
+    print(f"Transform time: {embedding_start - tensors_start}")
+    print(f"Embedding time: {func_end - embedding_start}")
+    # Compute dot product
+    dot_product = torch.dot(embedding[0], embedding[1])
+
+    # Compute magnitudes (norms)
+    norm1 = torch.norm(embedding[0])
+    norm2 = torch.norm(embedding[1])
+    print(embedding)
+
+    # Compute cosine similarity
+    cos_sim = dot_product / (norm1 * norm2)
+    return ComputeSimilarityResponse(similarity=cos_sim.item())

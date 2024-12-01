@@ -21,3 +21,12 @@ class EmbedImageRequest(BaseModel):
 class EmbedImageResponse(BaseModel):
     embeddings: List[List[float]]
 
+
+class ComputeSimilarityRequest(BaseModel):
+    base: str
+    target: str
+    model: AvailableModels = AvailableModels.levit_256
+
+
+class ComputeSimilarityResponse(BaseModel):
+    similarity: float
