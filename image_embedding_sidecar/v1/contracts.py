@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class AvailableModels(str, Enum):
     mobilenetv3_large_100 = "mobilenetv3_large_100"
+    levit_256 = "levit_256.fb_dist_in1k"
 
 
 class AvailableModelsResponse(BaseModel):
@@ -14,8 +15,9 @@ class AvailableModelsResponse(BaseModel):
 
 class EmbedImageRequest(BaseModel):
     filenames: str
-    model: AvailableModels = AvailableModels.mobilenetv3_large_100
+    model: AvailableModels = AvailableModels.levit_256
 
 
 class EmbedImageResponse(BaseModel):
     embeddings: List[List[float]]
+
