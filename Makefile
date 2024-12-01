@@ -10,7 +10,7 @@ migrate-down:
 go-run:
 	go run src/main.go
 
-sidecar-run:
+sidecar:
 	uv run python image_embedding_sidecar
 
 build:
