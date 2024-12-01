@@ -26,7 +26,7 @@ async def available_models() -> AvailableModelsResponse:
     return AvailableModelsResponse(available_models=[m for m in AvailableModels])
 
 
-@router.post("/embed_images")
+@router.post("/images/embeddings")
 async def embed_image(request: EmbedImageRequest) -> EmbedImageResponse:
     func_start = time.perf_counter()
     model = models_loader.load_model(request.model)
@@ -57,7 +57,7 @@ async def embed_image(request: EmbedImageRequest) -> EmbedImageResponse:
     return EmbedImageResponse(embeddings=embedding.tolist())
 
 
-@router.post("/compute_similarity")
+@router.post("/images/similarity")
 async def compute_similarity(
     request: ComputeSimilarityRequest,
 ) -> ComputeSimilarityResponse:
