@@ -28,6 +28,7 @@ async def available_models() -> AvailableModelsResponse:
 async def embed_image(request: EmbedImageRequest) -> EmbedImageResponse:
     func_start = time.perf_counter()
     model = models_loader.load_model(request.model)
+    model.eval()
     if model is None:
         raise HTTPException(status_code=406, detail="model not available")
 
