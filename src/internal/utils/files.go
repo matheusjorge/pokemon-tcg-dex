@@ -2,11 +2,9 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
 	"os"
-	"strings"
 )
 
 func LoadJson[T any](filepath string, placeholderVar *T) error {
@@ -28,11 +26,4 @@ func LoadJson[T any](filepath string, placeholderVar *T) error {
 		return err
 	}
 	return nil
-}
-
-func ImageURLToFilename(url string) string {
-	parts := strings.Split(url, "/")
-	filename := fmt.Sprintf("%s-%s", parts[len(parts)-2], parts[len(parts)-1])
-
-	return filename
 }

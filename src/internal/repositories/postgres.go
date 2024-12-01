@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/matheusjorge/pokemon-tcg-dex/src/internal/models"
 	"github.com/matheusjorge/pokemon-tcg-dex/src/internal/utils"
+	"github.com/pgvector/pgvector-go"
 )
 
 type PgRepo struct {
@@ -265,4 +266,83 @@ func (r *PgRepo) GetImageURLs() ([]string, error) {
 
 	return imageURLs, nil
 
+}
+
+func (r *PgRepo) InsertEmbeddings(ids []string, embeddings [][]float32) {
+	query := `
+	UPDATE cards SET image_embedding = $1 WHERE id = $2
+	`
+
+	for i := 0; i < len(ids); i++ {
+		_, err := r.Conn.Exec(context.Background(), query, pgvector.NewVector(embeddings[i]), ids[i])
+		if err != nil {
+			slog.Error("Failed to insert embedding", slog.Any("err_msg", err))
+			continue
+		}
+		slog.Debug("Inserted embedding", slog.String("cardId", ids[i]))
+	}
+
+}
+
+func (r *PgRepo) FindSimilarCards(embedding []float32) []models.SimilarSearchResponse {
+	query := `
+	SELECT
+		 id
+		,image_small
+		,1 - (image_embedding <=> $1) AS similarity
+	FROM
+		cards
+	WHERE
+		1=1
+		--AND set_id = 'sv8'
+	ORDER BY
+		image_embedding <=> $1
+	LIMIT 5
+	`
+	similarCards := []models.SimilarSearchResponse{}
+	rows, err := r.Conn.Query(context.Background(), query, pgvector.NewVector(embedding))
+
+	if err != nil {
+		slog.Error("Failed to query similar cards", slog.Any("err_msg", err))
+		return similarCards
+	}
+
+	for rows.Next() {
+		var response models.SimilarSearchResponse
+		err = rows.Scan(
+			&response.Id,
+			&response.Image,
+			&response.Similarity,
+		)
+
+		if err != nil {
+			slog.Error("Failed to parse similar card", slog.Any("err_msg", err))
+		}
+
+		similarCards = append(similarCards, response)
+
+	}
+
+	return similarCards[:5]
+}
+
+func (r *PgRepo) ComputeDistancetoCard(embedding []float32) float32 {
+	query := `
+	SELECT
+		1 - (image_embedding <=> $1)
+	FROM
+		cards
+	WHERE
+		1=1
+		AND id = 'sv8-123'
+	`
+	row := r.Conn.QueryRow(context.Background(), query, pgvector.NewVector(embedding))
+	var similarity float32
+
+	err := row.Scan(&similarity)
+	if err != nil {
+		slog.Error("Failed to parse similarity")
+	}
+
+	return similarity
 }

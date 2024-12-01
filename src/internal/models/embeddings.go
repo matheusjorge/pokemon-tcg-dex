@@ -1,7 +1,7 @@
 package models
 
 type EmbeddingResponse struct {
-	Embeddings [][]float64 `json:"embedding"`
+	Embeddings [][]float32 `json:"embeddings"`
 }
 
 type EmbeddingRequest struct {

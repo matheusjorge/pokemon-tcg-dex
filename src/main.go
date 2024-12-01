@@ -27,6 +27,8 @@ func main() {
 		cmd.DownloadSets(config),
 		cmd.InsertCardsData(config, pgRepo),
 		cmd.DownloadImages(config, pgRepo),
+		cmd.InsertImageEmbeddings(config, pgRepo),
+		cmd.FindSimilars(config, pgRepo),
 	}
 	cmd.AddCommands(commands)
 
