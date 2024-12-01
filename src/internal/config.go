@@ -15,6 +15,7 @@ type Config struct {
 	DataConfigFile         string
 	ImageDownloaderWorkers int
 	SidecarPort            int
+	ServerPort             int
 }
 
 const (
@@ -26,6 +27,7 @@ const (
 	DataConfigFile_DEFAULT         = "data_config.json"
 	ImageDownloaderWorkers_DEFAULT = "5"
 	SidecarPort_DEFAULT            = "8000"
+	ServerPort_DEFAULT             = "8001"
 )
 
 func LoadConfigs() (*Config, error) {
@@ -40,6 +42,7 @@ func LoadConfigs() (*Config, error) {
 	config.DataConfigFile = loadEnvVar("DATA_CONFIG_FILE", DataConfigFile_DEFAULT)
 	config.ImageDownloaderWorkers, _ = strconv.Atoi(loadEnvVar("IMAGE_DOWNLOADER_WORKERS", ImageDownloaderWorkers_DEFAULT))
 	config.SidecarPort, _ = strconv.Atoi(loadEnvVar("SIDECAR_PORT", SidecarPort_DEFAULT))
+	config.ServerPort, _ = strconv.Atoi(loadEnvVar("SERVER_PORT", ServerPort_DEFAULT))
 
 	return config, nil
 }

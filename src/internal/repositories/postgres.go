@@ -284,7 +284,7 @@ func (r *PgRepo) InsertEmbeddings(ids []string, embeddings [][]float32) {
 
 }
 
-func (r *PgRepo) FindSimilarCards(embedding []float32) []models.SimilarSearchResponse {
+func (r *PgRepo) FindSimilarCards(embedding []float32, nSimilar int) []models.SimilarSearchResponse {
 	query := `
 	SELECT
 		 id
@@ -297,10 +297,10 @@ func (r *PgRepo) FindSimilarCards(embedding []float32) []models.SimilarSearchRes
 		--AND set_id = 'sv8'
 	ORDER BY
 		image_embedding <=> $1
-	LIMIT 5
+	LIMIT $2
 	`
 	similarCards := []models.SimilarSearchResponse{}
-	rows, err := r.Conn.Query(context.Background(), query, pgvector.NewVector(embedding))
+	rows, err := r.Conn.Query(context.Background(), query, pgvector.NewVector(embedding), nSimilar)
 
 	if err != nil {
 		slog.Error("Failed to query similar cards", slog.Any("err_msg", err))
@@ -323,7 +323,7 @@ func (r *PgRepo) FindSimilarCards(embedding []float32) []models.SimilarSearchRes
 
 	}
 
-	return similarCards[:5]
+	return similarCards
 }
 
 func (r *PgRepo) ComputeDistancetoCard(embedding []float32) float32 {

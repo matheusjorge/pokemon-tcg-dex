@@ -22,7 +22,7 @@ func GetEmbedding(filenames []string, cfg *Config) ([][]float32, error) {
 		return [][]float32{}, nil
 	}
 	payloadBytes := []byte(payloadJson)
-	sidecarURL := fmt.Sprintf("http://0.0.0.0:%d/v1/embed_images", cfg.SidecarPort)
+	sidecarURL := fmt.Sprintf("http://0.0.0.0:%d/v1/images/embeddings", cfg.SidecarPort)
 
 	req, err := http.NewRequest("POST", sidecarURL, bytes.NewBuffer(payloadBytes))
 	if err != nil {

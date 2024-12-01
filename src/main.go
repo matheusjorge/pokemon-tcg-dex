@@ -29,6 +29,7 @@ func main() {
 		cmd.DownloadImages(config, pgRepo),
 		cmd.InsertImageEmbeddings(config, pgRepo),
 		cmd.FindSimilars(config, pgRepo),
+		cmd.InitAPI(config, pgRepo),
 	}
 	cmd.AddCommands(commands)
 
@@ -36,23 +37,5 @@ func main() {
 		slog.Error("Failed to run command", slog.Any("err_msg", err))
 		os.Exit(1)
 	}
-
-	// var imagePaths []string
-	// for i, url := range imageURLs {
-	// 	imagePaths = append(imagePaths, fmt.Sprintf("%s/images/%s", config.DataPath, utils.ImageURLToFilename(url)))
-	//
-	// 	if i > 4 {
-	// 		break
-	// 	}
-	// }
-	//
-	// slog.Debug("Get image paths", slog.Any("paths", imagePaths))
-	//
-	// embeddings, err := internal.GetEmbedding(imagePaths, *config)
-	// if err != nil {
-	// 	slog.Error("Failed to get embeddings", slog.Any("err_msg", err))
-	// }
-	//
-	// println(embeddings[0])
 
 }

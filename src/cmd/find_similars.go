@@ -22,7 +22,7 @@ func FindSimilars(cfg *internal.Config, pgRepo *repositories.PgRepo) cobra.Comma
 		if err != nil {
 			slog.Error("Failed to get target embedding", slog.Any("err_msg", err))
 		}
-		similarCards := pgRepo.FindSimilarCards(targetEmbedding[0])
+		similarCards := pgRepo.FindSimilarCards(targetEmbedding[0], 5)
 		slog.Debug(
 			"Similar cards retrieved",
 			slog.Any("cards", similarCards),
