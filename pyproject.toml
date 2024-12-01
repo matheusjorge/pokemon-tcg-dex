@@ -15,5 +15,9 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# [tool.uv.workspace]
+[tool.hatch.build.targets.wheel]
+packages = ["image_embedding_sidecar"]
+
+[tool.uv.workspace]
+exclude = ["src"]
 # members = ["image_embedding_sidecar"]
