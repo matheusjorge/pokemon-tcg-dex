@@ -13,5 +13,20 @@ go-run:
 sidecar:
 	uv run python image_embedding_sidecar
 
+front:
+	uv run streamlit run tcgdex_front/Homepage.py
+
 build:
 	go build -o tcgdex ./src
+
+api: build
+	./tcgdex api
+
+docker-build:
+	docker compose build
+
+docker-up: docker-build
+	docker compose up -d
+
+docker-down:
+	docker compose down
