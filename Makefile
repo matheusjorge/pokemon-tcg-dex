@@ -1,6 +1,3 @@
-compose-up:
-	docker compose up -d
-
 migrate-up:
 	migrate -path=src/internal/repositories/migrations -database "postgresql://ash:pikachu@0.0.0.0:5432/pokedex?sslmode=disable" -verbose up
 
@@ -9,6 +6,9 @@ migrate-down:
 
 go-run:
 	go run src/main.go
+
+db-setup:
+	./tcgdex download-sets && ./tcgdex insert-cards && ./tcgdex download-images && ./tcgdex insert-embeddings 
 
 sidecar:
 	uv run python image_embedding_sidecar
@@ -30,3 +30,5 @@ docker-up: docker-build
 
 docker-down:
 	docker compose down
+
+
