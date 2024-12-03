@@ -2,4 +2,4 @@ import os
 
 
 class Config:
-    pass
+    ENV = os.getenv("ENV", "dev")

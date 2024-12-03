@@ -1,7 +1,8 @@
 import asyncio
+import json
 import time
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
 import torch
@@ -17,6 +18,7 @@ from image_embedding_sidecar.v1.contracts import (
 )
 from image_embedding_sidecar.v1.models import models_loader
 from image_embedding_sidecar.utils import load_image
+from image_embedding_sidecar.logger import logger
 
 router = APIRouter(prefix="/v1")
 
@@ -48,13 +50,19 @@ async def embed_image(request: EmbedImageRequest) -> EmbedImageResponse:
     embedding = model(torch.stack(tensors))
 
     func_end = time.perf_counter()
-    print(f"Total time: {func_end - func_start}")
-    print(f"Load Model time: {download_start - func_start}")
-    print(f"Download images time: {tensors_start - download_start}")
-    print(f"Transform time: {embedding_start - tensors_start}")
-    print(f"Embedding time: {func_end - embedding_start}")
+    logger.debug(
+        "Finished embeddings execution",
+        total_time=func_end - func_start,
+        load_model_time=download_start - func_start,
+        download_time=tensors_start - download_start,
+        transform_time=embedding_start - tensors_start,
+        embedding_time=func_end - embedding_start,
+    )
 
-    return EmbedImageResponse(embeddings=embedding.tolist())
+    return Response(
+        content=json.dumps({"embeddings": embedding.tolist()}),
+        media_type="application/json",
+    )
 
 
 @router.post("/images/similarity")
