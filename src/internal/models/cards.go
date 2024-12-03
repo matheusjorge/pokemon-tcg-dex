@@ -59,29 +59,29 @@ type CardJson struct {
 }
 
 type Card struct {
-	Id                    string
-	Name                  string
-	Supertype             string
-	Subtypes              []string
-	Level                 string
-	HP                    int
-	Types                 []string
-	EvolvesFrom           string
-	EvolvesTo             []string
-	Rules                 []string
-	AncientTrait          AncientTrait
-	Abilities             []Ability
-	Attacks               []Attack
-	Weaknessess           []TypeRelationship
-	Resistances           []TypeRelationship
-	SetId                 string
-	Number                string
-	Artist                string
-	Rarity                string
-	NationalPokedexNumber int
-	RetreatCost           []string
-	ConvertedRetreatCost  int
-	Images                Images
+	Id                    string             `json:"id"`
+	Name                  string             `json:"name"`
+	Supertype             string             `json:"supertype"`
+	Subtypes              []string           `json:"subtypes"`
+	Level                 string             `json:"level"`
+	HP                    int                `json:"hp"`
+	Types                 []string           `json:"types"`
+	EvolvesFrom           string             `json:"evolves_from"`
+	EvolvesTo             []string           `json:"evolves_to"`
+	Rules                 []string           `json:"rules"`
+	AncientTrait          AncientTrait       `json:"ancient_trait"`
+	Abilities             []Ability          `json:"abilities"`
+	Attacks               []Attack           `json:"attack"`
+	Weaknessess           []TypeRelationship `json:"weaknesses"`
+	Resistances           []TypeRelationship `json:"resistances"`
+	SetId                 string             `json:"set_id"`
+	Number                string             `json:"number"`
+	Artist                string             `json:"artist"`
+	Rarity                string             `json:"rarity"`
+	NationalPokedexNumber int                `json:"national_pokedex_number"`
+	RetreatCost           []string           `json:"retreat_cost"`
+	ConvertedRetreatCost  int                `json:"converted_retreat_cost"`
+	Images                Images             `json:"images"`
 }
 
 func FromJsonToPg(cardJson *CardJson) (*Card, error) {

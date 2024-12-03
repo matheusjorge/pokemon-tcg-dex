@@ -31,6 +31,7 @@ func FindSimilarsWrapper(cfg *internal.Config, pgRepo *repositories.PgRepo) http
 		nSimilar, err := strconv.Atoi(r.FormValue("n_similar"))
 		if err != nil {
 			slog.Warn("Failed to retrieve n_similar value. Using default", slog.Any("err_msg", err))
+			nSimilar = 1
 		}
 
 		slog.Debug(
@@ -67,6 +68,38 @@ func FindSimilarsWrapper(cfg *internal.Config, pgRepo *repositories.PgRepo) http
 		}
 
 		res, err := json.Marshal(FindSimilarsResponse{Cards: similarCards})
+		if err != nil {
+			http.Error(w, "Failed to parse response", http.StatusInternalServerError)
+		}
+		_, err = w.Write(res)
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
+	}
+}
+
+func GetCardWrapper(cfg *internal.Config, pgRepo *repositories.PgRepo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cardId := r.PathValue("id")
+
+		card := pgRepo.FetchCard(cardId)
+
+		res, err := json.Marshal(card)
+		if err != nil {
+			http.Error(w, "Failed to parse response", http.StatusInternalServerError)
+		}
+		_, err = w.Write(res)
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
+	}
+}
+func GetAllCardsWrapper(cfg *internal.Config, pgRepo *repositories.PgRepo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		cards := pgRepo.FetchAllCards()
+
+		res, err := json.Marshal(cards)
 		if err != nil {
 			http.Error(w, "Failed to parse response", http.StatusInternalServerError)
 		}

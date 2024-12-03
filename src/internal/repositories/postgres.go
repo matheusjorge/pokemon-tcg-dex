@@ -183,7 +183,32 @@ func (r *PgRepo) InsertManyCards(cards []models.Card) {
 
 func (r *PgRepo) FetchAllCards() []models.Card {
 	query := `
-  SELECT * FROM cards
+  SELECT 
+    id,
+    name,
+    set_id,
+    number,
+    artist,
+    rarity,
+    national_pokedex_number,
+    image_small,
+    image_large,
+    supertype,
+    subtypes,
+    level,
+    hp,
+    types,
+    evolves_from,
+    evolves_to,
+    rules,
+    ancient_trait,
+    abilities,
+    attacks,
+    weaknesses,
+    resistances,
+    retreat_cost,
+    converted_retreat_cost
+  FROM cards
   `
 	rows, _ := r.Conn.Query(context.Background(), query)
 	defer rows.Close()
@@ -225,7 +250,7 @@ func (r *PgRepo) FetchAllCards() []models.Card {
 			&card.ConvertedRetreatCost,
 		)
 		if err != nil {
-			slog.Error("Failed to parse card", slog.Any("err_msg", err))
+			slog.Warn("Failed to parse card", slog.Any("err_msg", err))
 			continue
 		}
 
@@ -241,6 +266,62 @@ func (r *PgRepo) FetchAllCards() []models.Card {
 	}
 
 	return cards
+}
+
+func (r *PgRepo) FetchCard(cardId string) models.Card {
+	query := `
+  SELECT * FROM cards WHERE id = $1
+  `
+	rows := r.Conn.QueryRow(context.Background(), query, cardId)
+	var card models.Card
+	var images models.Images
+	var ancientTrait string
+	var abilities string
+	var attacks string
+	var weaknesses string
+	var resistances string
+	var embeddings string
+
+	err := rows.Scan(
+		&card.Id,
+		&card.Name,
+		&card.SetId,
+		&card.Number,
+		&card.Artist,
+		&card.Rarity,
+		&card.NationalPokedexNumber,
+		&images.Small,
+		&images.Large,
+		&card.Supertype,
+		&card.Subtypes,
+		&card.Level,
+		&card.HP,
+		&card.Types,
+		&card.EvolvesFrom,
+		&card.EvolvesTo,
+		&card.Rules,
+		&ancientTrait,
+		&abilities,
+		&attacks,
+		&weaknesses,
+		&resistances,
+		&card.RetreatCost,
+		&card.ConvertedRetreatCost,
+		&embeddings,
+	)
+	if err != nil {
+		slog.Error("Failed to parse card", slog.Any("err_msg", err))
+		return models.Card{}
+	}
+
+	card.Images = images
+	utils.JsonUnmarshal(ancientTrait, &card.AncientTrait)
+	utils.JsonUnmarshal(abilities, &card.Abilities)
+	utils.JsonUnmarshal(attacks, &card.Attacks)
+	utils.JsonUnmarshal(weaknesses, &card.Weaknessess)
+	utils.JsonUnmarshal(resistances, &card.Resistances)
+
+	return card
 }
 
 func (r *PgRepo) GetImageURLs() ([]string, error) {
@@ -288,13 +369,12 @@ func (r *PgRepo) FindSimilarCards(embedding []float32, nSimilar int) []models.Si
 	query := `
 	SELECT
 		 id
-		,image_small
+		,image_large
 		,1 - (image_embedding <=> $1) AS similarity
 	FROM
 		cards
 	WHERE
 		1=1
-		--AND set_id = 'sv8'
 	ORDER BY
 		image_embedding <=> $1
 	LIMIT $2

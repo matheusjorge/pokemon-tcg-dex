@@ -11,13 +11,15 @@ import (
 
 func InitRoutes(cfg *internal.Config, pgRepo *repositories.PgRepo) *http.ServeMux {
 	mux := http.ServeMux{}
-	err := os.MkdirAll("./temp", os.ModePerm)
+	err := os.MkdirAll("./tmp", os.ModePerm)
 	if err != nil {
 		slog.Error("Failed to create temp folder", slog.Any("err_msg", err))
 		return &mux
 	}
 
 	mux.HandleFunc("POST /v1/cards/similar", FindSimilarsWrapper(cfg, pgRepo))
+	mux.HandleFunc("GET /v1/cards/get/{id}", GetCardWrapper(cfg, pgRepo))
+	mux.HandleFunc("GET /v1/cards/get/all", GetAllCardsWrapper(cfg, pgRepo))
 
 	return &mux
 }
