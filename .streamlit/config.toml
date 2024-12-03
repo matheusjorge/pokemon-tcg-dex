@@ -1,0 +1,56 @@
+[theme]
+# # Primary accent color for interactive elements.
+# primaryColor = "#F39C12"
+#
+# # Background color for the main content area.
+# backgroundColor = "#FFF5E6"
+#
+# # Background color used for the sidebar and most interactive widgets.
+# secondaryBackgroundColor = "#FFDAB9"
+#
+# # Color used for almost all text.
+# textColor = "#5A3E1B"
+
+#
+# # Primary accent color for interactive elements.
+# primaryColor = "#FFD700"
+#
+# # Background color for the main content area.
+# backgroundColor = "#212121"
+#
+# # Background color used for the sidebar and most interactive widgets.
+# secondaryBackgroundColor = "#424242"
+#
+# # Color used for almost all text.
+# textColor = "#FFEB3B"
+
+
+# # Primary accent color for interactive elements.
+# primaryColor = "#E25822"  # Fiery orange-red (inspired by fire)
+#
+# # Background color for the main content area.
+# backgroundColor = "#1B1B1B"  # Dark charcoal black
+#
+# # Background color used for the sidebar and most interactive widgets.
+# secondaryBackgroundColor = "#2C2C2C"  # Slightly lighter charcoal
+#
+# # Color used for almost all text.
+# textColor = "#FFB366"  # Soft glowing orange for readability
+
+# Primary accent color for interactive elements.
+primaryColor = "#E63946"  # Vibrant Pokéball red
+
+# Background color for the main content area.
+backgroundColor = "#FFFFFF"  # Clean white, resembling the Pokéball's top half
+
+# Background color used for the sidebar and most interactive widgets.
+secondaryBackgroundColor = "#F4F4F4"  # Light gray for subtle contrast
+
+# Color used for almost all text.
+textColor = "#333333"  # Dark neutral black for readability
+
+
+
+
+
+
