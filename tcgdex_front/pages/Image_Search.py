@@ -68,9 +68,8 @@ def render_similar_card():
                     "Similarity",
                     format_similarity(cards[card_number]["similarity"]),
                 )
-                st.toggle(
-                    "Collected",
-                    value=conn.sql(
+                collected = (
+                    conn.sql(
                         f"""
                             SELECT
                                 collected
@@ -80,7 +79,11 @@ def render_similar_card():
                             """
                     )
                     .to_df()["collected"][0]
-                    .item(),
+                    .item()
+                )
+                st.toggle(
+                    "Add to collection" if not collected else "Remove from collection",
+                    value=collected,
                     on_change=duckdb.update_collected,
                     kwargs={"card_id": cards[card_number]["id"]},
                 )
