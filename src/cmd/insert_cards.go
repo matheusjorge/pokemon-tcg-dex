@@ -13,7 +13,7 @@ import (
 )
 
 func LoadSet(cfg *internal.Config, set string) []models.Card {
-	slog.Debug("Loading set", slog.String("set_name", set))
+	// slog.Debug("Loading set", slog.String("set_name", set))
 	var cardsJson []models.CardJson
 	filepath := fmt.Sprintf("%s/cards/%s.json", cfg.DataPath, set)
 	err := utils.LoadJson(filepath, &cardsJson)
@@ -44,11 +44,13 @@ func LoadAllSets(cfg *internal.Config) []models.Card {
 	if err != nil {
 		return []models.Card{}
 	}
+	bar := utils.CreateProgressBar(len(dataConfig["cards_sets"]), "Loading sets ...")
 	for _, set := range dataConfig["cards_sets"] {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			c := LoadSet(cfg, set)
+			_ = bar.Add(1)
 			cardsChannel <- c
 		}()
 	}

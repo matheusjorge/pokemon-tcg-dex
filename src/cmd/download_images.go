@@ -23,6 +23,8 @@ func FetchImages(imgsURLs []string, cfg *internal.Config) {
 
 	slog.Debug("Created url queue")
 
+	bar := utils.CreateProgressBar(len(imgsURLs), "Downloading Images")
+
 	wg.Add(cfg.ImageDownloaderWorkers)
 	for i := 0; i < cfg.ImageDownloaderWorkers; i++ {
 		slog.Debug("Starting worker", slog.Int("id", i))
@@ -30,10 +32,11 @@ func FetchImages(imgsURLs []string, cfg *internal.Config) {
 			defer wg.Done()
 
 			for url := range q {
-				slog.Debug("Downloading Image", slog.String("url", url))
+				// slog.Debug("Downloading Image", slog.String("url", url))
 
 				filepath := fmt.Sprintf("%s/images/%s", cfg.DataPath, utils.ImageURLToFilename(url))
 				utils.FetchResource(url, filepath)
+				_ = bar.Add(1)
 			}
 
 		}(queue, &wg)

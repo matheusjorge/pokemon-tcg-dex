@@ -27,10 +27,11 @@ func InsertImageEmbeddings(cfg *internal.Config, pgRepo *repositories.PgRepo) co
 				cardIDs = append(cardIDs, utils.ImageURLToCardIDd(url))
 			}
 
-			slog.Debug("Parsed image paths", slog.Any("paths", imagePaths), slog.Any("ids", cardIDs))
+			// slog.Debug("Parsed image paths", slog.Any("paths", imagePaths), slog.Any("ids", cardIDs))
 
 			chunkSize := 100
 			start_idx := 0
+			bar := utils.CreateProgressBar(len(cardIDs)/chunkSize+1, "Generating embeddings ...")
 			for {
 				end_idx := min(len(cardIDs)-1, start_idx+chunkSize)
 				embeddings, err := internal.GetEmbedding(imagePaths[start_idx:end_idx], cfg)
@@ -40,8 +41,10 @@ func InsertImageEmbeddings(cfg *internal.Config, pgRepo *repositories.PgRepo) co
 				pgRepo.InsertEmbeddings(cardIDs[start_idx:end_idx], embeddings)
 				start_idx = end_idx
 				if end_idx == len(cardIDs)-1 {
+					bar.Close()
 					break
 				}
+				_ = bar.Add(1)
 			}
 
 		},

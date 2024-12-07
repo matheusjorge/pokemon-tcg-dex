@@ -360,7 +360,7 @@ func (r *PgRepo) InsertEmbeddings(ids []string, embeddings [][]float32) {
 			slog.Error("Failed to insert embedding", slog.Any("err_msg", err))
 			continue
 		}
-		slog.Debug("Inserted embedding", slog.String("cardId", ids[i]))
+		// slog.Debug("Inserted embedding", slog.String("cardId", ids[i]))
 	}
 
 }
