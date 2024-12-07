@@ -8,7 +8,10 @@ go-run:
 	go run src/main.go
 
 db-setup:
-	./tcgdex download-sets && ./tcgdex insert-cards && ./tcgdex download-images && ./tcgdex insert-embeddings 
+	./tcgdex download-sets && \
+	./tcgdex insert-cards && \
+	./tcgdex download-images && \
+	./tcgdex insert-embeddings 
 
 sidecar:
 	uv run python image_embedding_sidecar

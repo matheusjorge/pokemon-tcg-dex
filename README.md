@@ -28,12 +28,12 @@ Follow these steps to set up and run the application.
 
 2. Bring up the application services:
    ```bash
-   make compose-up
+   make docker-up
    ```
 
 3. Apply database migrations:
    ```bash
-   make migration-up
+   make migrate-up
    ```
 
 4. Build the application:
@@ -41,7 +41,12 @@ Follow these steps to set up and run the application.
    make build
    ```
 
-5. Initialize the database:
+5. In a separate terminal, start the sidecar service (it is needed to compute the embeddings):
+   ```bash
+   make sidecar
+   ```
+
+6. Initialize the database:
    ```bash
    make db-setup
    ```
@@ -50,7 +55,7 @@ Follow these steps to set up and run the application.
 
 In separate terminal windows, run the following commands:
 
-1. Start the sidecar service:
+1. Start the sidecar service (if it is not already started):
    ```bash
    make sidecar
    ```
